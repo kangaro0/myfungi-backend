@@ -1,0 +1,1 @@
+mongod.exe --dbpath="D:\Projects\myfungi-backend\db"
