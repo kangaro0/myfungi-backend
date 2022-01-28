@@ -1,6 +1,6 @@
 require( 'dotenv' ).config()
 import BaseController from "./base.controller";
-import BlogPost from '../interfaces/blog-post';
+import BlogPost from '../interfaces/blogpost';
 
 export default class BlogController extends BaseController {
     

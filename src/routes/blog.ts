@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { MongoError } from 'mongodb';
 import BlogController from '../controllers/blog.controller';
-import BlogPost from '../interfaces/blog-post'
+import BlogPost from '../interfaces/blogpost'
 import { Message } from './index';
 
 type Request = express.Request;
@@ -13,11 +13,11 @@ let controller = new BlogController();
 // GET
 router.get( "/", async ( req: Request, res: Response ) => {
     try {
-        let items = controller.getAll();
+        let items = await controller.getAll();
         res.status( 200 ).json( items );
     } catch( err ){
-        let message: Message = { type: "Error", content: err.message };
-        res.status( 500 ).json( err );
+        let message: Message = { type: err.name, content: err.message };
+        res.status( 500 ).json( message );
     }
 });
 
@@ -26,7 +26,7 @@ router.get( "/:id", async ( req: Request, res: Response ) => {
     try {
         id = parseInt( req.params[ 0 ] );
     } catch( err ){
-        let message: Message = { type: "Error", content: "Bad request" };
+        let message: Message = { type: err.name, content: "Bad request" };
         res.status( 400 ).json( message );
         return;
     }
@@ -35,7 +35,7 @@ router.get( "/:id", async ( req: Request, res: Response ) => {
         let item = await controller.getOne( id );
         res.status( 200 ).json( item );
     } catch( err ) {
-        let message: Message = { type: "Error", content: err.message };
+        let message: Message = { type: err.name, content: err.message };
         res.status( 500 ).json( message );
     }
 });
@@ -48,7 +48,7 @@ router.post( "/", async ( req: Request, res: Response ) => {
         let message: Message = { type: "Success", content: "" };
         res.status( 200 ).json( message );
     } catch( err ){
-        let message: Message = { type: "Error", content: err.message };
+        let message: Message = { type: err.name, content: err.message };
         let status = 0;
 
         switch( ( err as MongoError ).code ){
@@ -68,7 +68,7 @@ router.put( "/:id", async ( req: Request, res: Response ) => {
     try {
         id = parseInt( req.params[ 0 ] );
     } catch( err ){
-        let message: Message = { type: "Error", content: "Bad request" };
+        let message: Message = { type: err.name, content: "Bad request" };
         res.status( 400 ).json( message );
         return;
     }
@@ -79,7 +79,7 @@ router.put( "/:id", async ( req: Request, res: Response ) => {
         let message: Message = { type: "Success", content: "" };
         res.send( 200 ).json( message );
     } catch( err ){
-        let message: Message = { type: "Error", content: err.code };              // return err code here for debugging
+        let message: Message = { type: err.name, content: err.code };              // return err code here for debugging
         res.status( 500 ).json( message );
     }
 });
