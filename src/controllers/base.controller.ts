@@ -1,5 +1,5 @@
 require( 'dotenv' ).config();
-import { MongoClient, DbOptions, CollectionOptions } from 'mongodb';
+import { MongoClient, Db, DbOptions, Collection, CollectionOptions } from 'mongodb';
 
 export default class BaseController {
 
@@ -37,12 +37,12 @@ export default class BaseController {
         this.connected = false;
     }
 
-    protected getDatabase( name: String, options?: DbOptions ){
+    protected getDatabase( name: String, options?: DbOptions ): Db {
         return this.client.db( name as string, options );
     }
 
-    protected getCollection( name: String, dbName?: String ){
-        let db = dbName ? this.getDatabase( dbName ) : this.getDatabase( process.env.DATABASE_NAME );
-        return db.collection( name as string );
+    protected getCollection( name: String, options?: CollectionOptions, dbName?: String, dbOptions?: DbOptions ): Collection {
+        let db = dbName ? this.getDatabase( dbName, dbOptions ) : this.getDatabase( process.env.DATABASE_NAME, dbOptions );
+        return db.collection( name as string, options );
     }
 }

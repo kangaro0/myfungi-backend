@@ -70,6 +70,7 @@ router.put( "/:id", async ( req: Request, res: Response ) => {
     } catch( err ){
         let message: Message = { type: "Error", content: "Bad request" };
         res.status( 400 ).json( message );
+        return;
     }
 
     try {
@@ -88,4 +89,5 @@ router.delete( "/:id", ( req: Request, res: Response ) => {
 
 });
 
-export default router;
+const Router = router;
+export default Router;

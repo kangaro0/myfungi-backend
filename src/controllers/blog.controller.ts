@@ -8,7 +8,7 @@ export default class BlogController extends BaseController {
         super();
     }
 
-    public async getAll(){
+    public async getAll(): Promise<Array<BlogPost>> {
         let items = new Array<BlogPost>( 0 );
 
         try {
@@ -29,7 +29,7 @@ export default class BlogController extends BaseController {
         return items;
     }
 
-    public async getOne( id: number ){
+    public async getOne( id: number ): Promise<BlogPost> {
         let item = null;
 
         try {
@@ -49,7 +49,7 @@ export default class BlogController extends BaseController {
         return item;
     }
 
-    public async insertOne( post: BlogPost ){
+    public async insertOne( post: BlogPost ): Promise<void> {
         try {
             await this.open();
 
@@ -62,7 +62,7 @@ export default class BlogController extends BaseController {
         }
     }
 
-    public async updateOne( id: number, post: BlogPost ){
+    public async updateOne( id: number, post: BlogPost ): Promise<void> {
         try { 
             await this.open();
 

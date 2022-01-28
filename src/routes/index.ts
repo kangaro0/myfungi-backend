@@ -1,4 +1,5 @@
 import * as express from 'express';
+import { default as BlogRouter } from './blog';
 
 // Messages
 export interface Message {
@@ -12,3 +13,6 @@ export interface Message {
 let router = express.Router();
 
 // setup middleware
+
+// setup child routes
+router.use( '/blog', BlogRouter );
