@@ -1,7 +1,7 @@
 import * as express from 'express';
 import { MongoError } from 'mongodb';
 import BlogController from '../controllers/blog.controller';
-import BlogPost from '../interfaces/blogpost'
+import Post from '../interfaces/blog/post'
 import { Message } from './index';
 
 type Request = express.Request;
@@ -21,18 +21,9 @@ router.get( "/", async ( req: Request, res: Response ) => {
     }
 });
 
-router.get( "/:id", async ( req: Request, res: Response ) => {
-    let id = null;
+router.get( "/:id", async ( req: Request, res: Response ) => {    
     try {
-        id = parseInt( req.params[ 0 ] );
-    } catch( err ){
-        let message: Message = { type: err.name, content: "Bad request" };
-        res.status( 400 ).json( message );
-        return;
-    }
-    
-    try {
-        let item = await controller.getOne( id );
+        let item = await controller.getOne( req.params[ "id" ] );
         res.status( 200 ).json( item );
     } catch( err ) {
         let message: Message = { type: err.name, content: err.message };
@@ -43,9 +34,9 @@ router.get( "/:id", async ( req: Request, res: Response ) => {
 // POST
 router.post( "/", async ( req: Request, res: Response ) => {
     try { 
-        await controller.insertOne( req.body as BlogPost )
+        let _id = await controller.insertOne( req.body as Post )
 
-        let message: Message = { type: "Success", content: "" };
+        let message: Message = { type: "Success", content: _id };
         res.status( 200 ).json( message );
     } catch( err ){
         let message: Message = { type: err.name, content: err.message };
@@ -64,20 +55,11 @@ router.post( "/", async ( req: Request, res: Response ) => {
 
 // PUT
 router.put( "/:id", async ( req: Request, res: Response ) => {
-    let id = null;
     try {
-        id = parseInt( req.params[ 0 ] );
-    } catch( err ){
-        let message: Message = { type: err.name, content: "Bad request" };
-        res.status( 400 ).json( message );
-        return;
-    }
-
-    try {
-        await controller.updateOne( id, req.body as BlogPost );
+        await controller.updateOne( req.params[ "id" ], req.body as Post );
 
         let message: Message = { type: "Success", content: "" };
-        res.send( 200 ).json( message );
+        res.status( 200 ).json( message );
     } catch( err ){
         let message: Message = { type: err.name, content: err.code };              // return err code here for debugging
         res.status( 500 ).json( message );
@@ -85,8 +67,16 @@ router.put( "/:id", async ( req: Request, res: Response ) => {
 });
 
 // DELETE
-router.delete( "/:id", ( req: Request, res: Response ) => {
+router.delete( "/:id", async ( req: Request, res: Response ) => {
+    try {
+        await controller.deleteOne( req.params[ "id"] );
 
+        let message: Message = { type: "Success", content: "" };
+        res.status( 200 ).json( message );
+    } catch( err ){
+        let message: Message = { type: err.name, content: err.code };
+        res.status( 500 ).json( message );
+    }
 });
 
 const Router = router;

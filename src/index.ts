@@ -1,20 +1,11 @@
-import express from 'express';
-import Router from './routes/index';
+import createServer from './app';
 
-let app = null;
-let port = 1337;
+let server = null;
+createServer().then( ( app ) => {
+    server = app;
 
-async function main(){
-    // setup express
-    app = express();
-
-    // register routes
-    app.use( '/', Router );
-
-    // start up
-    app.listen( port, () => {
-        console.log( `Server listening on port ${port}` );
+    process.once( 'SIGINT', ( code ) => {
+        console.log( 'Server shutting down...' );
+        server.close();
     });
-}
-
-main();
+});
