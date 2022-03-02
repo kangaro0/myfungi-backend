@@ -131,6 +131,7 @@ describe( 'DELETE /blog/', () => {
                 if( err )
                     done( err );
 
+                expect( res.body[ "type" ] ).toEqual( "Success" );
                 done();
         });
     });

@@ -14,6 +14,8 @@ export default async function createServer(): Promise<Express> {
         app.use( bodyParser.json() );
         app.use( bodyParser.urlencoded({ extended: true }) );
 
+        app.enable( 'etag' );
+
         // register routes
         app.use( '/', Router );
 
