@@ -1,5 +1,6 @@
 .vscode/
-certificates/
+certificates/localhost.key
+certificates/localhost.crt
 dist/
 db/
 node_modules/
