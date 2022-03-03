@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { MongoError } from 'mongodb';
+import Post from '../../interfaces/blog/post';
 import Message from '../../interfaces/common/message';
 import BlogController from '../../controllers/blog.controller';
 
@@ -57,6 +58,24 @@ export let updateOne = async ( req: Request, res: Response ) => {
         res.status( 500 ).json( message );
     }
 };
+
+export let updateMany = async ( req: Request, res: Response ) => {
+    try {
+        let items = req.body as Array<Post>;
+        let length = items.length;
+
+        for( let i = 0 ; i < length ; i++ ){
+            let item = items[ i ];
+            await controller.updateOne( item._id as string, item );
+        }
+
+        let message: Message = { type: "Success", content: "" };
+        res.status( 200 ).json( message );
+    } catch( err ){
+        let message: Message = { type: err.name, content: err.code };
+        res.status( 500 ).json( message );
+    }
+}
 
 export let deleteOne = async ( req: Request, res: Response ) => {
     try {

@@ -2,18 +2,17 @@
 export const PostSchema = { 
     type: "object",
     properties: {
-        _id: { type: "string" },
         date: { type: "string" },
         draft: { type: "boolean" },
         published: { type: "boolean" },
         title: { type: "string" },
         content: { type: "string" }
     },
-    required: [ "_id", "date", "draft", "published", "title", "content" ],
+    required: [ "date", "draft", "published", "title", "content" ],
     additionalProperties: false
 }
 
-export const PutSchema = {
+export const PutOneSchema = {
     type: "object",
     properties: {
         _id: { type: "string" },
@@ -25,4 +24,9 @@ export const PutSchema = {
     },
     required: [ "_id" ],
     additionalProperties: false
+}
+
+export const PutManySchema = {
+    "type": "array",
+    "items": PutOneSchema
 }

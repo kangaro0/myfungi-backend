@@ -1,5 +1,5 @@
 
 export default interface Message {
     type: "Error" | "Success";
-    content: string; 
+    content: string | Array<string>; 
 }
