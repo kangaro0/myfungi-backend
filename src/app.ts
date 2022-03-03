@@ -1,28 +1,38 @@
+require( 'dotenv' ).config();
+import * as fs from 'fs';
+import * as https from 'https';
 import express from 'express';
 import { Express } from 'express-serve-static-core';
-import bodyParser from 'body-parser';
-import Router from './routes/index';
+import { createRoutes } from './routes/index';
 
 const port = 1337;
 
-export default async function createServer(): Promise<Express> {
-    return new Promise<Express>( ( resolve, reject ) => {
-        // setup express
-        const app = express();
+export default async function createServer(): Promise<https.Server> {
+    return new Promise<https.Server>( ( resolve, reject ) => {
+        try {
+            // setup express
+            const app = express();
 
-        // register middleware
-        app.use( bodyParser.json() );
-        app.use( bodyParser.urlencoded({ extended: true }) );
+            app.enable( 'etag' );       // enable etag-caching for browsers
 
-        app.enable( 'etag' );
+            // register routes
+            app.use( '/', createRoutes() );
 
-        // register routes
-        app.use( '/', Router );
+            // load certificates
+            let credentials = {
+                key: fs.readFileSync( process.env.SSL_KEY_PATH, 'utf8' ),
+                cert: fs.readFileSync( process.env.SSL_CERT_PATH, 'utf8' )
+            };
 
-        // start up
-        app.listen( port, () => {
-            console.log( `Server listening on port ${port}` );
-            resolve( app );
-        });
+            // start up
+            const server = https.createServer( credentials, app );
+            server.listen( 1337, () => {
+                console.log( 'Server listening on port: 1337' );
+                resolve( server );
+            });
+            
+        } catch( err ){
+            reject( err );
+        }
     });
 }

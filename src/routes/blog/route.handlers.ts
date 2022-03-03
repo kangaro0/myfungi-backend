@@ -1,16 +1,11 @@
-import * as express from 'express';
+import { Request, Response } from 'express';
 import { MongoError } from 'mongodb';
-import BlogController from '../controllers/blog.controller';
-import Post, { PostValidation } from '../interfaces/blog/post'
-import { Message, matches } from './index';
+import Message from '../../interfaces/common/message';
+import BlogController from '../../controllers/blog.controller';
 
-type Request = express.Request;
-type Response = express.Response;
-
-let router = express.Router();
 let controller = new BlogController();
 
-let getAll = async ( req: Request, res: Response ) => {
+export let getAll = async ( req: Request, res: Response ) => {
     try {
         let items = await controller.getAll();
         res.status( 200 ).json( items );
@@ -20,7 +15,7 @@ let getAll = async ( req: Request, res: Response ) => {
     }
 };
 
-let getOne = async ( req: Request, res: Response ) => {
+export let getOne = async ( req: Request, res: Response ) => {
     try {
         let item = await controller.getOne( req.params[ "id" ] );
         res.status( 200 ).json( item );
@@ -30,9 +25,9 @@ let getOne = async ( req: Request, res: Response ) => {
     }
 };
 
-let insertOne = async ( req: Request, res: Response ) => {
+export let insertOne = async ( req: Request, res: Response ) => {
     try { 
-        let _id = await controller.insertOne( req.body as Post )
+        let _id = await controller.insertOne( req.body );
 
         let message: Message = { type: "Success", content: _id };
         res.status( 200 ).json( message );
@@ -51,9 +46,9 @@ let insertOne = async ( req: Request, res: Response ) => {
     }
 };
 
-let updateOne = async ( req: Request, res: Response ) => {
+export let updateOne = async ( req: Request, res: Response ) => {
     try {
-        await controller.updateOne( req.params[ "id" ], req.body as Post );
+        await controller.updateOne( req.params[ "id" ], req.body );
 
         let message: Message = { type: "Success", content: "" };
         res.status( 200 ).json( message );
@@ -63,7 +58,7 @@ let updateOne = async ( req: Request, res: Response ) => {
     }
 };
 
-let deleteOne = async ( req: Request, res: Response ) => {
+export let deleteOne = async ( req: Request, res: Response ) => {
     try {
         await controller.deleteOne( req.params[ "id"] );
 
@@ -74,19 +69,3 @@ let deleteOne = async ( req: Request, res: Response ) => {
         res.status( 500 ).json( message );
     }
 };
-
-// GET
-router.get( "/", getAll );
-router.get( "/:id", getOne );
-
-// POST
-router.post( "/", insertOne );
-
-// PUT
-router.put( "/:id", updateOne );
-
-// DELETE
-router.delete( "/:id", deleteOne );
-
-const Router = router;
-export default Router;

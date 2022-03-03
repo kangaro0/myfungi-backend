@@ -1,21 +1,18 @@
-import * as express from 'express';
-import { default as BlogRouter } from './blog';
-
-// Messages
-export interface Message {
-    type: "Error" | "Success";
-    content: string;
-}
+import { Router } from 'express';
+import bodyParser from 'body-parser';
+import { createBlogRouter } from './blog/route.definitions';
 
 // MongoDB Error Codes
 // https://github.com/mongodb/mongo/blob/master/src/mongo/base/error_codes.yml
 
-let router = express.Router();
+export let createRoutes = () => {
+    let router = Router();
 
-// setup middleware
+    // setup global middleware
+    router.use( bodyParser.json() );
 
-// setup child routes
-router.use( '/blog', BlogRouter );
+    // setup child routes
+    router.use( '/blog', createBlogRouter() );
 
-const Router = router;
-export default Router;
+    return router;
+}
