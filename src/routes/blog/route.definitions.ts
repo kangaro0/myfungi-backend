@@ -13,7 +13,7 @@ export let createBlogRouter = () => {
     router.post( "/", validatePost, insertOne );
 
     // PUT
-    router.put( "/", validatePutMany, updateMany );
+    router.put( "/", validatePutMany, updateMany );         // gets removed in future...
     router.put( "/:id", validatePutOne, updateOne );
 
     // DELETE

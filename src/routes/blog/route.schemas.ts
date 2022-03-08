@@ -22,7 +22,6 @@ export const PutOneSchema = {
         title: { type: "string" },
         content: { type: "string" }
     },
-    required: [ "_id" ],
     additionalProperties: false
 }
 

@@ -5,34 +5,37 @@ import Post from '../../interfaces/blog/post';
 import Message from '../../interfaces/common/message';
 
 const ajv = new Ajv();
-const validatePostFnc = ajv.compile<Post>( PostSchema );
-const validatePutOneFnc = ajv.compile<Post>( PutOneSchema );
-const validatePutManyFnc = ajv.compile<Array<Post>>( PutManySchema );
+const validatePostImpl = ajv.compile<Post>( PostSchema );
+const validatePutOneImpl = ajv.compile<Post>( PutOneSchema );
+const validatePutManyImpl = ajv.compile<Array<Post>>( PutManySchema );
 
 export let validatePost = ( req: Request, res: Response, next: NextFunction ) => {
-    if( validatePostFnc( req.body ) ){
+    if( validatePostImpl( req.body ) ){
         next();
         return;
     }
     
-    let message = buildErrorMessage( validatePostFnc.errors );
+    let message = buildErrorMessage( validatePostImpl.errors );
     res.status( 400 ).json( message );    
 }
 
 export let validatePutOne = ( req: Request, res: Response, next: NextFunction ) => {
-    // validate schema against request body and make sure that id given in query parameters matches the object's id
-    if( validatePutOneFnc( req.body ) && req.body[ "_id" ] === req.params[ "id" ] )
+    if( validatePutOneImpl( req.body ) ){
         next();
+        return;
+    }
 
-    let message = buildErrorMessage( validatePutOneFnc.errors );
+    let message = buildErrorMessage( validatePutOneImpl.errors );
     res.status( 400 ).json( message ); 
 }
 
 export let validatePutMany = ( req: Request, res: Response, next: NextFunction ) => {
-    if( validatePutManyFnc( req.body ) )
+    if( validatePutManyImpl( req.body ) ){
         next();
+        return;
+    }
 
-    let message = buildErrorMessage( validatePutManyFnc.errors );
+    let message = buildErrorMessage( validatePutManyImpl.errors );
     res.status( 400 ).json( message );
 }
 

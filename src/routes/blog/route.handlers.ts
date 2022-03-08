@@ -31,7 +31,7 @@ export let insertOne = async ( req: Request, res: Response ) => {
         let _id = await controller.insertOne( req.body );
 
         let message: Message = { type: "Success", content: _id };
-        res.status( 200 ).json( message );
+        res.status( 201 ).json( message );
     } catch( err ){
         let message: Message = { type: err.name, content: err.message };
         let status = 0;
@@ -49,9 +49,9 @@ export let insertOne = async ( req: Request, res: Response ) => {
 
 export let updateOne = async ( req: Request, res: Response ) => {
     try {
-        await controller.updateOne( req.params[ "id" ], req.body );
+        let updated = await controller.updateOne( req.params[ "id" ], req.body );
 
-        let message: Message = { type: "Success", content: "" };
+        let message: Message = { type: "Success", content: updated };
         res.status( 200 ).json( message );
     } catch( err ){
         let message: Message = { type: err.name, content: err.code };              // return err code here for debugging
@@ -63,6 +63,13 @@ export let updateMany = async ( req: Request, res: Response ) => {
     try {
         let items = req.body as Array<Post>;
         let length = items.length;
+
+        // check if all items that need to be update exist in database
+        for( let i = 0 ; i < length ; i++ ){
+            let item = items[ i ];
+            if( !controller.count({ _id: item._id }) )
+                throw new MongoError( "" ); 
+        }
 
         for( let i = 0 ; i < length ; i++ ){
             let item = items[ i ];
