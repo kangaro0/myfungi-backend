@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { MongoError } from 'mongodb';
 import Post from '../../interfaces/blog/post';
-import Message from '../../interfaces/common/message';
 import BlogController from '../../controllers/blog.controller';
 
 let controller = new BlogController();
@@ -11,51 +10,34 @@ export let getAll = async ( req: Request, res: Response ) => {
         let items = await controller.getAll();
         res.status( 200 ).json( items );
     } catch( err ){
-        let message: Message = { type: err.name, content: err.message };
-        res.status( 500 ).json( message );
+        res.status( 500 ).json( err );
     }
 };
 
 export let getOne = async ( req: Request, res: Response ) => {
     try {
-        let item = await controller.getOne( req.params[ "id" ] );
+        let item = await controller.getOne( { _id: req.params[ "id" ] } );
         res.status( 200 ).json( item );
     } catch( err ) {
-        let message: Message = { type: err.name, content: err.message };
-        res.status( 500 ).json( message );
+        res.status( 500 ).json( err );
     }
 };
 
 export let insertOne = async ( req: Request, res: Response ) => {
     try { 
-        let _id = await controller.insertOne( req.body );
-
-        let message: Message = { type: "Success", content: _id };
-        res.status( 201 ).json( message );
+        let inserted = await controller.insertOne( req.body );
+        res.status( 201 ).json( inserted );
     } catch( err ){
-        let message: Message = { type: err.name, content: err.message };
-        let status = 0;
-
-        switch( ( err as MongoError ).code ){
-            case 11000:                 // duplicate key
-                status = 400;
-            default:
-                status = 500;
-        }
-
-        res.status( status ).json( message );
+        res.status( 500 ).json( err );
     }
 };
 
 export let updateOne = async ( req: Request, res: Response ) => {
     try {
         let updated = await controller.updateOne( req.params[ "id" ], req.body );
-
-        let message: Message = { type: "Success", content: updated };
-        res.status( 200 ).json( message );
-    } catch( err ){
-        let message: Message = { type: err.name, content: err.code };              // return err code here for debugging
-        res.status( 500 ).json( message );
+        res.status( 200 ).json( updated );
+    } catch( err ){           
+        res.status( 500 ).json( err );
     }
 };
 
@@ -71,27 +53,25 @@ export let updateMany = async ( req: Request, res: Response ) => {
                 throw new MongoError( "" ); 
         }
 
+        let updatedItems = new Array<Post>( 0 );
+
         for( let i = 0 ; i < length ; i++ ){
             let item = items[ i ];
-            await controller.updateOne( item._id as string, item );
+            let updated = await controller.updateOne( item._id as string, item );
+            updatedItems.push( updated );
         }
 
-        let message: Message = { type: "Success", content: "" };
-        res.status( 200 ).json( message );
+        res.status( 200 ).json( updatedItems );
     } catch( err ){
-        let message: Message = { type: err.name, content: err.code };
-        res.status( 500 ).json( message );
+        res.status( 500 ).json( err );
     }
 }
 
 export let deleteOne = async ( req: Request, res: Response ) => {
     try {
         await controller.deleteOne( req.params[ "id"] );
-
-        let message: Message = { type: "Success", content: "" };
-        res.status( 200 ).json( message );
+        res.status( 200 ).end();
     } catch( err ){
-        let message: Message = { type: err.name, content: err.code };
-        res.status( 500 ).json( message );
+        res.status( 500 ).json( err );
     }
 };
