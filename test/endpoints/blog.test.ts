@@ -1,3 +1,5 @@
+require( 'dotenv' ).config();
+import * as fs from 'fs';
 import request from 'supertest';
 
 import createServer from '../../src/app';
@@ -15,11 +17,12 @@ beforeAll( async () => {
 describe( 'GET /blog/', () => {
     it( 'should return all posts', ( done ) => {
         request( server )
-            .get( '/blog/' )
+            .get( '/blog' )
+            .trustLocalhost()
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .end( ( err, res ) => {
-                if( err ) 
+                if( err )
                     done( err );
 
                 expect( res.body[ 0 ] ).toMatchObject({
@@ -40,6 +43,7 @@ describe( 'GET /blog/', () => {
 
         request( server )
             .get( `/blog/${_id}` )
+            .trustLocalhost()
             .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .end( ( err, res ) => {
@@ -73,7 +77,9 @@ describe( 'POST /blog/', () => {
         request( server )
             .post( '/blog' )
             .send( item )
-            .expect( 200 )
+            .trustLocalhost()
+            .expect( 'Content-Type', /json/ )
+            .expect( 201 )
             .end( ( err, res ) => {
                 if( err )
                     done( err );
@@ -99,7 +105,9 @@ describe( 'PUT /blog/', () => {
 
         request( server )
             .put( `/blog/${_id}` )
+            .trustLocalhost()
             .send( item )
+            .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .end( ( err, res ) => {
                 if( err )
@@ -109,6 +117,7 @@ describe( 'PUT /blog/', () => {
 
                 request( server )
                     .get( `/blog/${_id}` )
+                    .trustLocalhost()
                     .expect( 200 )
                     .end( ( err, res ) => {
                         if( err )
@@ -120,12 +129,16 @@ describe( 'PUT /blog/', () => {
                 });
         });
     });
+
+    //it( 'should not update ')
 });
 
 describe( 'DELETE /blog/', () => {    
     it( 'should delete a post', ( done ) => {
         request( server )
             .delete( `/blog/${_id}` )
+            .trustLocalhost()
+            .expect( 'Content-Type', /json/ )
             .expect( 200 )
             .end( ( err, res ) => {
                 if( err )
