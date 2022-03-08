@@ -114,19 +114,7 @@ describe( 'PUT /blog/', () => {
                     done( err );
 
                 expect( res.body[ "type" ] ).toEqual( "Success" );
-
-                request( server )
-                    .get( `/blog/${_id}` )
-                    .trustLocalhost()
-                    .expect( 200 )
-                    .end( ( err, res ) => {
-                        if( err )
-                            done( err );
-
-                        expect( res.body ).toMatchObject( item );
-
-                        done();
-                });
+                expect( res.body[ "content"] ).toMatchObject( item );
         });
     });
 
