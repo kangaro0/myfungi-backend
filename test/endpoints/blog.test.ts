@@ -10,8 +10,17 @@ let server;
 // helper variables for created and deleted items during tests
 let _id = "";
 
-beforeAll( async () => {
-    server = await createServer();
+beforeAll( ( done ) => {
+    createServer().then( ( obj ) => {
+        server = obj;
+        done();
+    }).catch( ( err ) => {
+        done( err );
+    });
+});
+
+afterAll( () => {
+    server.close();
 });
 
 describe( 'GET /blog/', () => {
@@ -114,7 +123,9 @@ describe( 'PUT /blog/', () => {
                     done( err );
 
                 expect( res.body[ "type" ] ).toEqual( "Success" );
-                expect( res.body[ "content"] ).toMatchObject( item );
+                expect( res.body[ "content" ] ).toMatchObject( item );
+
+                done();
         });
     });
 
