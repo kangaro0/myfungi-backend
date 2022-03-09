@@ -1,5 +1,5 @@
 require( 'dotenv' ).config()
-import { ObjectId, Document } from "mongodb";
+import { ObjectId, Document, Filter, FindOptions } from "mongodb";
 import BaseController from "./base.controller";
 import Post from "../interfaces/blog/post";
 
@@ -20,43 +20,36 @@ export default class BlogController extends BaseController {
         super();
     }
 
-    public async getAll( page: number = 0, pageSize: number = 0 ): Promise<Array<Post>> {
+    public async getMany( criteria: Filter<Post>, options?: FindOptions<Post> | null ): Promise<Array<Post>> {
         let items = new Array<Post>( 0 );
 
         try {
             await this.open();
 
             let collection = this.getCollection( process.env.COLLECTION_BLOG );
-            let cursor = await collection.find( {} );
+            let cursor = collection.find( criteria, options );
 
-            // implement pagination
-            let toSkip = page * pageSize;
-            cursor.skip( toSkip );
+            for await( const document of cursor )
+                items.push( document as Post );
 
-            if( pageSize != 0 )
-                cursor.limit( pageSize );
-
-            for await( const document of cursor ){
-                items.push( map_out_fnc( document ) );
-            }
-
-            await this.close();
-        } catch( err ){
+        } catch( err ) {
             throw err;
         }
 
         return items;
     }
 
-    public async getOne( id: string ): Promise<Post> {
+    public async getOne( criteria: Filter<Post>, options?: FindOptions<Post> ): Promise<Post> {
         let item = null;
+
+        criteria._id = new ObjectId( criteria._id as string );
 
         try {
             await this.open();
             
             let collection = this.getCollection( process.env.COLLECTION_BLOG );
 
-            let cursor = await collection.findOne( { _id: new ObjectId( id ) } );
+            let cursor = await collection.findOne( criteria, options );
             item = cursor ? map_out_fnc( cursor ) : {};
 
             await this.close();
@@ -68,7 +61,7 @@ export default class BlogController extends BaseController {
         return item;
     }
 
-    public async insertOne( post: Post ): Promise<string> {
+    public async insertOne( post: Post ): Promise<Post> {
         try {
             await this.open();
          
@@ -80,7 +73,7 @@ export default class BlogController extends BaseController {
             throw err;
         }
 
-        return post._id as string;
+        return post;
     }
 
     public async updateOne( id: string, post: Post ): Promise<Post> {
@@ -117,7 +110,7 @@ export default class BlogController extends BaseController {
         }
     }
 
-    public async count( criteria: object ): Promise<number> {
+    public async count( criteria: Filter<Post> ): Promise<number> {
         let num = 0;
         
         try {

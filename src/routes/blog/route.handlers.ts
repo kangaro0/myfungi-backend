@@ -5,9 +5,9 @@ import BlogController from '../../controllers/blog.controller';
 
 let controller = new BlogController();
 
-export let getAll = async ( req: Request, res: Response ) => {
+export let getMany = async ( req: Request, res: Response ) => {
     try {
-        let items = await controller.getAll();
+        let items = await controller.getMany( req.parsed.query.criteria, req.parsed.query.options );
         res.status( 200 ).json( items );
     } catch( err ){
         res.status( 500 ).json( err );
@@ -16,7 +16,7 @@ export let getAll = async ( req: Request, res: Response ) => {
 
 export let getOne = async ( req: Request, res: Response ) => {
     try {
-        let item = await controller.getOne( { _id: req.params[ "id" ] } );
+        let item = await controller.getOne( req.parsed.params );
         res.status( 200 ).json( item );
     } catch( err ) {
         res.status( 500 ).json( err );

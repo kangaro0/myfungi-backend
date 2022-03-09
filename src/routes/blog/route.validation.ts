@@ -2,7 +2,6 @@ import Ajv, { ErrorObject } from 'ajv';
 import { Request, Response, NextFunction } from 'express';
 import { PostSchema, PutOneSchema, PutManySchema } from './route.schemas';
 import Post from '../../interfaces/blog/post';
-import Message from '../../interfaces/common/message';
 
 const ajv = new Ajv();
 const validatePostImpl = ajv.compile<Post>( PostSchema );
@@ -55,7 +54,7 @@ let parseErrors = ( errors: ErrorArray ): Array<string> => {
 }
 
 // helper function to build error message
-let buildErrorMessage = ( errors: ErrorArray ): Message => {
+let buildErrorMessage = ( errors: ErrorArray ) => {
     let content = parseErrors( errors );
     return {
         type: "Error",

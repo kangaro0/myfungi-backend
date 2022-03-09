@@ -2,6 +2,7 @@
     "compilerOptions": {
         "outDir": "./dist",
         "rootDir": "./src",
+        "typeRoots": [ "./types" ],
         "target": "esnext",
         "module": "commonjs",
         "moduleResolution": "node",
